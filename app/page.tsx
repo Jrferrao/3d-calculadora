@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Printer } from "lucide-react";
+import { FileBox } from 'lucide-react';
 import { Navigation, TabId } from "@/components/Navigation";
 import { SettingsPanel } from "@/components/SettingsPanel";
 import { FilamentManager } from "@/components/FilamentManager";
@@ -15,6 +15,7 @@ import {
   SavedPart,
   STORAGE_KEYS,
 } from "@/lib/types";
+import Image from "next/image";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabId>("calculator");
@@ -54,16 +55,21 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <header className="border-b border-surface-border bg-surface-raised/80 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-5 sm:px-6">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/20">
-            <Printer className="h-5 w-5 text-accent" />
+        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-4 sm:px-6">
+          <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-white/10 shadow-md transition-transform hover:scale-105">
+            <img
+              src="/logo.png"
+              alt="Logo Mundo Trizzi"
+              className="h-full w-full object-cover"
+            />
           </div>
+
           <div>
-            <h1 className="text-lg font-bold text-white sm:text-xl">
+            <h1 className="text-xl font-bold tracking-tight text-white">
               Calculadora de Impressão 3D
             </h1>
-            <p className="text-xs text-gray-400 sm:text-sm">
-              Custo de produção, preço de venda e portfolio.
+            <p className="text-sm text-gray-400">
+              Custo de produção, preço de venda e portfólio.
             </p>
           </div>
         </div>
@@ -98,7 +104,7 @@ export default function Home() {
       </main>
 
       <footer className="border-t border-surface-border py-4 text-center text-xs text-gray-500">
-        &reg; JJBV - Impressão 3D
+        &reg; Mundo Trizzi - Impressão 3D
       </footer>
     </div>
   );

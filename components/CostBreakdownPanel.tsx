@@ -1,6 +1,10 @@
 "use client";
 
-import { CostBreakdown, GlobalSettings } from "@/lib/types";
+import {
+  CostBreakdown,
+  GlobalSettings,
+  Marketplace,
+} from "@/lib/types";
 import { formatCurrency, formatHours } from "@/lib/calculations";
 import {
   Package,
@@ -17,6 +21,8 @@ interface CostBreakdownPanelProps {
   breakdown: CostBreakdown;
   settings: GlobalSettings;
   profitMarginPercent: number;
+  marketplace: Marketplace;
+  onMarketplaceChange: (marketplace: Marketplace) => void;
   onSalePriceChange: (price: number | undefined) => void;
 }
 
@@ -24,6 +30,8 @@ export function CostBreakdownPanel({
   breakdown,
   settings,
   profitMarginPercent,
+  marketplace,
+  onMarketplaceChange,
   onSalePriceChange,
 }: CostBreakdownPanelProps) {
   const items = [
@@ -113,6 +121,58 @@ export function CostBreakdownPanel({
         </div>
 
         <div className="rounded-lg border border-surface-border bg-surface-overlay p-4 space-y-3">
+          <div>
+            <label className="label-text">
+              Marketplace
+            </label>
+
+            <select
+              value={marketplace}
+              onChange={(e) =>
+                onMarketplaceChange(e.target.value as Marketplace)
+              }
+              className="input-field"
+            >
+              <option value="none">Sem marketplace</option>
+              <option value="mercadoLivre">Mercado Livre</option>
+              <option value="shopee">Shopee</option>
+              <option value="tiktokShop">TikTok Shop</option>
+            </select>
+          </div>
+
+          {marketplace !== "none" && (
+            <div className="rounded-lg bg-surface px-3 py-3 space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-400">
+                  Taxa do marketplace
+                </span>
+
+                <span className="font-medium text-gray-200">
+                  {(breakdown.marketplaceFeePercent ?? 0).toFixed(2)}%                
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-400">
+                  Valor da taxa
+                </span>
+
+                <span className="font-medium text-gray-200">
+                  {formatCurrency(breakdown.marketplaceFeeAmount ?? 0)}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between border-t border-surface-border pt-2">
+                <span className="font-medium text-gray-200">
+                  Preço sugerido com marketplace
+                </span>
+
+                <span className="text-lg font-bold text-accent">
+                  {formatCurrency(breakdown.marketplaceSalePrice ?? breakdown.suggestedSalePrice)}
+                </span>
+              </div>
+            </div>
+          )}
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-400">
               Preço sugerido ({profitMarginPercent}% margem)
@@ -133,9 +193,14 @@ export function CostBreakdownPanel({
                 type="number"
                 min={0}
                 step={0.01}
-                value={breakdown.salePrice || ""}
+                value={
+                  breakdown.salePrice > 0
+                    ? breakdown.salePrice.toFixed(2)
+                    : ""
+                }
                 onChange={(e) => {
                   const value = parseFloat(e.target.value);
+
                   onSalePriceChange(
                     e.target.value === "" ? undefined : value
                   );

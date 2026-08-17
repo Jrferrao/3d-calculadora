@@ -13,9 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Calculadora de Custo — Impressão 3D",
+  title: "Mundo Trizzi — Impressão 3D",
   description:
     "Calcule o custo de produção e preço de venda das suas peças impressas em 3D.",
+  icons: {
+    icon: "/logo.png"
+  }
 };
 
 export default function RootLayout({

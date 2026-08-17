@@ -76,52 +76,98 @@ export function calculateCostBreakdown(
     0
   );
 
-  const subtotal =
-    filamentCost +
-    energyCost +
-    maintenanceCost +
-    laborCost +
-    additionalCostsTotal;
+const subtotal =
+  filamentCost +
+  energyCost +
+  maintenanceCost +
+  laborCost +
+  additionalCostsTotal;
 
-  const failureCost = subtotal * (settings.failureRatePercent / 100);
-  const productionCost = subtotal + failureCost;
-  const suggestedSalePrice =
-    productionCost * (1 + calculation.profitMarginPercent / 100);
+const failureCost = subtotal * (settings.failureRatePercent / 100);
+const productionCost = subtotal + failureCost;
 
-  const isManualPrice = calculation.manualSalePrice != null;
+// Preço base considerando a margem de lucro desejada
+const baseSalePrice =
+  productionCost * (1 + calculation.profitMarginPercent / 100);
 
-  const salePrice = isManualPrice
-    ? calculation.manualSalePrice!
-    : suggestedSalePrice;
+// Identifica a taxa do marketplace selecionado
+let marketplaceFeePercent = 0;
 
-  const profitAmount = salePrice - productionCost;
-  const effectiveMarginPercent =
-    productionCost > 0 ? (salePrice / productionCost - 1) * 100 : 0;
+switch (calculation.marketplace) {
+  case "mercadoLivre":
+    marketplaceFeePercent = settings.mercadoLivreFeePercent;
+    break;
 
-  return {
-    filamentCost,
-    energyCost,
-    maintenanceCost,
-    laborCost,
-    additionalCostsTotal,
-    subtotal,
-    failureCost,
-    productionCost,
-    suggestedSalePrice,
-    salePrice,
-    profitAmount,
-    effectiveMarginPercent,
-    isManualPrice,
-    totalPrintHours,
-  };
+  case "shopee":
+    marketplaceFeePercent = settings.shopeeFeePercent;
+    break;
+
+  case "tiktokShop":
+    marketplaceFeePercent = settings.tiktokShopFeePercent;
+    break;
+
+  default:
+    marketplaceFeePercent = 0;
+}
+
+// Calcula o preço necessário para que, após a taxa,
+// reste o preço base desejado.
+const marketplaceSalePrice =
+  marketplaceFeePercent > 0 && marketplaceFeePercent < 100
+    ? baseSalePrice / (1 - marketplaceFeePercent / 100)
+    : baseSalePrice;
+
+const isManualPrice = calculation.manualSalePrice != null;
+
+// Se o usuário informar um preço manual,
+// ele passa a ser o preço final desejado.
+const salePrice = isManualPrice
+  ? calculation.manualSalePrice!
+  : marketplaceSalePrice;
+
+// Valor da taxa descontada pelo marketplace
+const marketplaceFeeAmount =
+  salePrice * (marketplaceFeePercent / 100);
+
+// O valor que efetivamente sobra depois da taxa
+const netSalePrice = salePrice - marketplaceFeeAmount;
+
+// Lucro real após descontar a taxa do marketplace
+const profitAmount = netSalePrice - productionCost;
+
+const effectiveMarginPercent =
+  productionCost > 0
+    ? (netSalePrice / productionCost - 1) * 100
+    : 0;
+ 
+ return {
+  filamentCost,
+  energyCost,
+  maintenanceCost,
+  laborCost,
+  additionalCostsTotal,
+  subtotal,
+  failureCost,
+  productionCost,
+  suggestedSalePrice: baseSalePrice,
+  salePrice,
+  profitAmount,
+  effectiveMarginPercent,
+  isManualPrice,
+  totalPrintHours,
+  marketplaceFeePercent,
+  marketplaceFeeAmount,
+  marketplaceSalePrice,
+};
 }
 
 export function formatCurrency(value: number): string {
   return value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-}
+  style: "currency",
+  currency: "BRL",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})};
 
 export function formatHours(hours: number): string {
   const h = Math.floor(hours);

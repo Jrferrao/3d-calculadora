@@ -6,6 +6,9 @@ export interface GlobalSettings {
   maintenanceRatePerHour: number;
   laborRatePerHour: number;
   failureRatePercent: number;
+  mercadoLivreFeePercent: number;
+  shopeeFeePercent: number;
+  tiktokShopFeePercent: number;
 }
 
 export interface Filament {
@@ -24,6 +27,12 @@ export interface AdditionalCost {
   value: number;
 }
 
+export type Marketplace =
+  | "none"
+  | "mercadoLivre"
+  | "shopee"
+  | "tiktokShop";
+
 export interface PartCalculation {
   filamentId: string;
   partWeightGrams: number;
@@ -32,6 +41,7 @@ export interface PartCalculation {
   additionalCosts: AdditionalCost[];
   postProcessingMinutes: number;
   profitMarginPercent: number;
+  marketplace?: Marketplace;
   manualSalePrice?: number;
 }
 
@@ -50,6 +60,9 @@ export interface CostBreakdown {
   effectiveMarginPercent: number;
   isManualPrice: boolean;
   totalPrintHours: number;
+  marketplaceFeePercent: number;
+  marketplaceFeeAmount: number;
+  marketplaceSalePrice: number;
 }
 
 export interface SavedPart {
@@ -68,6 +81,9 @@ export const DEFAULT_SETTINGS: GlobalSettings = {
   maintenanceRatePerHour: 0.5,
   laborRatePerHour: 25,
   failureRatePercent: 5,
+  mercadoLivreFeePercent: 0,
+  shopeeFeePercent: 0,
+  tiktokShopFeePercent: 0,
 };
 
 export const FILAMENT_TYPES: FilamentType[] = ["PLA", "PETG", "ABS", "TPU"];

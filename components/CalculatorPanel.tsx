@@ -33,6 +33,7 @@ const defaultCalculation: PartCalculation = {
   additionalCosts: [],
   postProcessingMinutes: 0,
   profitMarginPercent: 30,
+  marketplace: "none",
 };
 
 export function CalculatorPanel({
@@ -356,12 +357,19 @@ export function CalculatorPanel({
           <div className="space-y-4">
             {hasValidCalculation ? (
               <>
-                <CostBreakdownPanel
-                  breakdown={breakdown}
-                  settings={settings}
-                  profitMarginPercent={calculation.profitMarginPercent}
-                  onSalePriceChange={handleSalePriceChange}
-                />
+                  <CostBreakdownPanel
+                    breakdown={breakdown}
+                    settings={settings}
+                    profitMarginPercent={calculation.profitMarginPercent}
+                    marketplace={calculation.marketplace ?? "none"}
+                    onMarketplaceChange={(marketplace) =>
+                      updateCalculation({
+                        marketplace,
+                        manualSalePrice: undefined,
+                      })
+                    }
+                    onSalePriceChange={handleSalePriceChange}
+                  />
 
                 {!showSaveForm ? (
                   <button
